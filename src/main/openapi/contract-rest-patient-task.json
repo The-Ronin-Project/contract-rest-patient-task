@@ -222,7 +222,10 @@
               "$ref": "#/components/schemas/Task"
             }
           }
-        }
+        },
+        "required": [
+          "data"
+        ]
       },
       "Task": {
         "type": "object",
@@ -247,7 +250,14 @@
             "type": "boolean",
             "description": "Whether the task is still able to be completed."
           }
-        }
+        },
+        "required": [
+          "questionnaireId",
+          "questionnaireName",
+          "lastCompletedDate",
+          "endOfAvailabilityWindow",
+          "available"
+        ]
       }
     },
     "examples": {
