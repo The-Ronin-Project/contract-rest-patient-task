@@ -1,0 +1,276 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Patient Task Service REST API - OpenAPI 3.0",
+    "description": "REST API contract for the patient task service. Includes a single endpoint for getting patient's tasks.\n\nSome useful links:\n- [Task Service Repository](https://github.com/projectronin/prodeng-patient-task)",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "bhefley@projectronin.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  },
+  "servers": [
+    {
+      "url": "/api/v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "tasks",
+      "description": "Operations about tasks"
+    }
+  ],
+  "paths": {
+    "/tasks/{tenantId}/{patientId}": {
+      "get": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Get tasks for patient",
+        "description": "Get tasks for patient by tenantId and patientId",
+        "operationId": "getTasks",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenantId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the tenant for the current tenant",
+            "example": "1xrekpx5"
+          },
+          {
+            "in": "path",
+            "name": "patientId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The UDP ID of the current patient",
+            "example": "018c275e-c378-7c4a-a112-157e4c0e4cb5"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskListBody"
+                },
+                "examples": {
+                  "FetchPatientQuestionnairesResponse": {
+                    "$ref": "#/components/examples/TaskListResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Error"
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "BadRequestExample": {
+                    "$ref": "#/components/examples/BadRequestException"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Error"
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "ForbiddenExample": {
+                    "$ref": "#/components/examples/ForbiddenException"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique ID for this error"
+          },
+          "source": {
+            "type": "string",
+            "description": "Service where the error originated"
+          },
+          "httpStatus": {
+            "type": "string",
+            "enum": [
+              "NOT_FOUND",
+              "FORBIDDEN",
+              "BAD_REQUEST"
+            ],
+            "description": "String representation of HTTP status"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status"
+          },
+          "error": {
+            "type": "string",
+            "description": "Human readable form of the exception or httpStatus. This MUST be included"
+          },
+          "exception": {
+            "type": "string",
+            "description": "The exception class"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human readable message"
+          },
+          "detail": {
+            "type": "string",
+            "description": "A human readable message that describes the specific failure"
+          }
+        }
+      },
+      "TaskListBody": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Task"
+            }
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "questionnaireName": {
+            "type": "string",
+            "description": "The name of the questionnaire that will be displayed to the patient."
+          },
+          "questionnaireId": {
+            "type": "string",
+            "description": "The id of the questionnaire that will be used to lookup in questionnaire service."
+          },
+          "lastCompletedDate": {
+            "type": "string",
+            "description": "The date that the task was last completed."
+          },
+          "endOfAvailabilityWindow": {
+            "type": "string",
+            "description": "The date that the task should be completed by."
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Whether the task is still able to be completed."
+          }
+        }
+      }
+    },
+    "examples": {
+      "TaskListResponse": {
+        "summary": "Task list response example",
+        "value": {
+          "tasks": [
+            {
+              "questionnaireId": "1",
+              "questionnaireName": "Questionnaire 1",
+              "lastCompletedDate": "2020-01-01T00:00:00Z",
+              "endOfAvailabilityWindow": "2020-01-01T00:00:00Z",
+              "available": true
+            }
+          ]
+        }
+      },
+      "BadRequestException": {
+        "summary": "Bad Request",
+        "value": {
+          "errors": [
+            {
+              "id": "8b03fbee-7e96-4491-9621-73ca0213c27d",
+              "source": "questionnaire-service",
+              "httpStatus": "BAD_REQUEST",
+              "timestamp": "2023-19-25T06:53:17.62Z",
+              "status": 400,
+              "error": "Bad request",
+              "exception": "com.projectronin.product.common.exception.BadRequestException",
+              "message": "Could not parse request body",
+              "detail": "Must include the \"type\" property"
+            }
+          ]
+        }
+      },
+      "ForbiddenException": {
+        "summary": "Forbidden",
+        "value": {
+          "errors": [
+            {
+              "id": "8b03fbee-7e96-4491-9621-73ca0213c27d",
+              "source": "questionnaire-service",
+              "httpStatus": "FORBIDDEN",
+              "status": 403,
+              "error": "Forbidden",
+              "exception": "com.projectronin.produce.common.exception.ForbiddenException",
+              "message": "Forbidden",
+              "detail": "No"
+            }
+          ]
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
