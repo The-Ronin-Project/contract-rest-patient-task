@@ -197,9 +197,25 @@
           }
         }
       },
+      "Paging": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Zero-indexed page. Value is set in the request query params"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Max limit of the number of records to get back in response. Value is set in the request query params"
+          }
+        }
+      },
       "TaskListBody": {
         "type": "object",
         "properties": {
+          "paging": {
+              "$ref": "#/components/schemas/Paging"
+          },
           "data": {
             "type": "array",
             "items": {
@@ -238,6 +254,10 @@
       "TaskListResponse": {
         "summary": "Task list response example",
         "value": {
+          "paging": {
+            "limit": 10,
+            "page": 0
+          },
           "data": [
             {
               "questionnaireId": "1",
