@@ -29,7 +29,7 @@
     }
   ],
   "paths": {
-    "/tasks/{tenantId}/{patientId}": {
+    "/tenants/{tenantId}/patients/{patientId}/tasks": {
       "get": {
         "tags": [
           "tasks"
