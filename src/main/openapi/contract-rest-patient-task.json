@@ -24,18 +24,22 @@
   ],
   "tags": [
     {
-      "name": "tasks",
+      "name": "Tasks",
       "description": "Operations about tasks"
+    },
+    {
+      "name": "Questionnaires",
+      "description": "Operations about tasks with type Questionnaires"
     }
   ],
   "paths": {
     "/tenants/{tenantId}/patients/{patientId}/tasks": {
       "get": {
         "tags": [
-          "tasks"
+          "Tasks"
         ],
-        "summary": "Get tasks for patient",
-        "description": "Get tasks for patient by tenantId and patientId",
+        "summary": "Get all tasks for patient",
+        "description": "Get all tasks for patient by tenantId and patientId",
         "operationId": "getTasks",
         "security": [
           {
@@ -95,6 +99,126 @@
                 "examples": {
                   "FetchPatientQuestionnairesResponse": {
                     "$ref": "#/components/examples/TaskListResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Error"
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "BadRequestExample": {
+                    "$ref": "#/components/examples/BadRequestException"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Error"
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "ForbiddenExample": {
+                    "$ref": "#/components/examples/ForbiddenException"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/patients/{patientId}/questionnaires": {
+      "get": {
+        "tags": [
+          "Questionnaires"
+        ],
+        "summary": "Get active questionnaires for patient",
+        "description": "Get questionnaires for patient by tenantId and patientId",
+        "operationId": "getQuestionnaires",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenantId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the tenant for the current tenant",
+            "example": "1xrekpx5"
+          },
+          {
+            "in": "path",
+            "name": "patientId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The UDP ID of the current patient",
+            "example": "018c275e-c378-7c4a-a112-157e4c0e4cb5"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Paging param to control the number of tasks to get back",
+            "example": 20,
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Zero-indexed page number",
+            "example": 0,
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionnaireListBody"
+                },
+                "examples": {
+                  "FetchPatientQuestionnairesResponse": {
+                    "$ref": "#/components/examples/QuestionnaireListResponse"
                   }
                 }
               }
@@ -210,11 +334,28 @@
           }
         }
       },
-      "TaskListBody": {
+      "QuestionnaireListBody": {
         "type": "object",
         "properties": {
           "paging": {
               "$ref": "#/components/schemas/Paging"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Questionnaire"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "TaskListBody": {
+        "type": "object",
+        "properties": {
+          "paging": {
+            "$ref": "#/components/schemas/Paging"
           },
           "data": {
             "type": "array",
@@ -230,6 +371,91 @@
       "Task": {
         "type": "object",
         "properties": {
+          "patientId": {
+            "type": "string",
+            "description": "Patient UDP ID"
+          },
+          "tenantId": {
+            "type": "string",
+            "description": "The tenant ID"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The reference ID to external components of the task"
+          },
+          "assignerId": {
+            "type": "string",
+            "description": "The reference ID for who assigned the task"
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of task"
+          },
+          "repeatable": {
+            "type": "boolean",
+            "description": "Whether the task can be immediately repeated once completed"
+          },
+          "lastCompletedDate": {
+            "type": "string",
+            "description": "The date that the questionnaire was last completed."
+          },
+          "timing": {
+            "$ref": "#/components/schemas/Timing"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the task is active"
+          }
+        },
+        "required": [
+          "patientId",
+          "tenantId",
+          "assignerId",
+          "type",
+          "active"
+        ]
+      },
+      "Timing": {
+        "type": "object",
+        "description": "The timing of the task for the given patient.",
+        "properties": {
+          "repeat": {
+            "type": "object",
+            "description": "The repeat details of the task",
+            "properties": {
+              "period": {
+                "type": "integer",
+                "description": "The period of the task in period units"
+              },
+              "periodUnit": {
+                "type": "string",
+                "description": "The time unit of the period"
+              },
+              "bounds": {
+                "type": "object",
+                "description": "The bounds of the task",
+                "properties": {
+                  "start": {
+                    "type": "string",
+                    "description": "The start time of the task"
+                  },
+                  "end": {
+                    "type": "string",
+                    "description": "The end time of the task"
+                  }
+                }
+              }
+            },
+            "required": ["period", "periodUnit"]
+          }
+        },
+        "required": [
+          "repeat"
+        ]
+      },
+      "Questionnaire": {
+        "type": "object",
+        "properties": {
           "questionnaireName": {
             "type": "string",
             "description": "The name of the questionnaire that will be displayed to the patient."
@@ -240,15 +466,15 @@
           },
           "lastCompletedDate": {
             "type": "string",
-            "description": "The date that the task was last completed."
+            "description": "The date that the questionnaire was last completed."
           },
           "endOfAvailabilityWindow": {
             "type": "string",
-            "description": "The date that the task should be completed by."
+            "description": "The date that the questionnaire should be completed by."
           },
           "available": {
             "type": "boolean",
-            "description": "Whether the task is still able to be completed."
+            "description": "Whether the questionnaire is still able to be completed."
           }
         },
         "required": [
@@ -261,8 +487,8 @@
       }
     },
     "examples": {
-      "TaskListResponse": {
-        "summary": "Task list response example",
+      "QuestionnaireListResponse": {
+        "summary": "Questionnaire list response example",
         "value": {
           "paging": {
             "limit": 10,
@@ -275,6 +501,35 @@
               "lastCompletedDate": "2020-01-01T00:00:00Z",
               "endOfAvailabilityWindow": "2020-01-01T00:00:00Z",
               "available": true
+            }
+          ]
+        }
+      },
+      "TaskListResponse": {
+        "summary": "Task list response example",
+        "value": {
+          "paging": {
+            "limit": 10,
+            "page": 0
+          },
+          "data": [
+            {
+              "tenantId": "h387afy7-B898-253F93F1F48C",
+              "patientId": "h387afy7-B898-253F93F1F48C",
+              "referenceId": "h387afy7-B898-253F93F1F48C",
+              "type": "QUESTIONNAIRE",
+              "assignerId": "h387afy7-B898-253F93F1F48C",
+              "timing": {
+                "repeat": {
+                  "period": 1,
+                  "periodUnit": "d",
+                  "bounds": {
+                    "start": "2020-01-01T00:00:00.000Z",
+                    "end": "2020-01-27T00:00:00.000Z"
+                  }
+                }
+              },
+              "active": true
             }
           ]
         }
