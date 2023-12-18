@@ -24,11 +24,11 @@
   ],
   "tags": [
     {
-      "name": "Tasks",
+      "name": "Task",
       "description": "Operations about tasks"
     },
     {
-      "name": "Questionnaires",
+      "name": "Questionnaire",
       "description": "Operations about tasks with type Questionnaires"
     }
   ],
@@ -36,7 +36,7 @@
     "/tenants/{tenantId}/patients/{patientId}/tasks": {
       "get": {
         "tags": [
-          "Tasks"
+          "Task"
         ],
         "summary": "Get all tasks for patient",
         "description": "Get all tasks for patient by tenantId and patientId",
@@ -156,7 +156,7 @@
     "/tenants/{tenantId}/patients/{patientId}/questionnaires": {
       "get": {
         "tags": [
-          "Questionnaires"
+          "Questionnaire"
         ],
         "summary": "Get active questionnaires for patient",
         "description": "Get questionnaires for patient by tenantId and patientId",
