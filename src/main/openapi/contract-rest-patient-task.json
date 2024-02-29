@@ -413,7 +413,8 @@
           "assignerId",
           "type",
           "active"
-        ]
+        ],
+        "additionalProperties": false
       },
       "Timing": {
         "type": "object",
@@ -447,7 +448,8 @@
             "type": "string",
             "description": "The date that the task timing was last reset."
           }
-        }
+        },
+        "additionalProperties": false
       },
       "Questionnaire": {
         "type": "object",
@@ -480,7 +482,8 @@
           "questionnaireId",
           "assignerId",
           "available"
-        ]
+        ],
+        "additionalProperties": false
       }
     },
     "examples": {
@@ -531,8 +534,8 @@
               "active": true,
               "repeatable": true,
               "timing": {
-                "start": "2020-01-01T00:00:00.000Z",
-                "end": "2020-01-27T00:00:00.000Z"
+                "startDate": "2020-01-01T00:00:00.000Z",
+                "endDate": "2020-01-27T00:00:00.000Z"
               }
             },
             {
