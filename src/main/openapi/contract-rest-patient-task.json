@@ -473,7 +473,7 @@
           "timing": {
             "$ref": "#/components/schemas/Timing"
           },
-          "lastCompletedDate": {
+          "lastCompletedAt": {
             "type": "string",
             "description": "The date that the questionnaire was last completed."
           }
@@ -500,7 +500,7 @@
               "assignerId": "80704e6a-9541-4468-ad75-1c0bd50ca310",
               "available": true,
               "repeatable": true,
-              "lastCompletedDate": "2020-01-01T00:00:00Z"
+              "lastCompletedAt": "2020-01-01T00:00:00Z"
             },
             {
               "questionnaireId": "2",
@@ -512,7 +512,7 @@
                 "period": 1,
                 "periodUnit": "w"
               },
-              "lastCompletedDate": "2020-01-01T00:00:00Z"
+              "lastCompletedAt": "2020-01-01T00:00:00Z"
             }
           ]
         }
