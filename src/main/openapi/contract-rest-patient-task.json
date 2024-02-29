@@ -153,14 +153,14 @@
         }
       }
     },
-    "/tenants/{tenantId}/patients/{patientId}/questionnaires": {
+    "/tenants/{tenantId}/patients/{patientId}/active-questionnaires": {
       "get": {
         "tags": [
           "Questionnaire"
         ],
         "summary": "Get active questionnaires for patient",
         "description": "Get questionnaires for patient by tenantId and patientId",
-        "operationId": "getQuestionnaires",
+        "operationId": "getActiveQuestionnaires",
         "security": [
           {
             "bearerAuth": []
@@ -379,10 +379,6 @@
             "type": "string",
             "description": "The tenant ID"
           },
-          "referenceId": {
-            "type": "string",
-            "description": "The reference ID to external components of the task"
-          },
           "assignerId": {
             "type": "string",
             "description": "The reference ID for who assigned the task"
@@ -391,20 +387,24 @@
             "type": "string",
             "description": "The type of task"
           },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the task is active"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The reference ID to external components of the task"
+          },
           "repeatable": {
             "type": "boolean",
             "description": "Whether the task can be immediately repeated once completed"
           },
-          "lastCompletedDate": {
-            "type": "string",
-            "description": "The date that the questionnaire was last completed."
-          },
           "timing": {
             "$ref": "#/components/schemas/Timing"
           },
-          "active": {
-            "type": "boolean",
-            "description": "Whether the task is active"
+          "lastCompletedAt": {
+            "type": "string",
+            "description": "The date that the questionnaire was last completed."
           }
         },
         "required": [
@@ -417,71 +417,68 @@
       },
       "Timing": {
         "type": "object",
-        "description": "The timing of the task for the given patient.",
+        "description": "The repeat details of the task for the given patient.",
         "properties": {
-          "repeat": {
-            "type": "object",
-            "description": "The repeat details of the task",
-            "properties": {
-              "period": {
-                "type": "integer",
-                "description": "The period of the task in period units"
-              },
-              "periodUnit": {
-                "type": "string",
-                "description": "The time unit of the period"
-              },
-              "bounds": {
-                "type": "object",
-                "description": "The bounds of the task",
-                "properties": {
-                  "start": {
-                    "type": "string",
-                    "description": "The start time of the task"
-                  },
-                  "end": {
-                    "type": "string",
-                    "description": "The end time of the task"
-                  }
-                }
-              }
-            },
-            "required": ["period", "periodUnit"]
+          "frequency": {
+            "type": "integer",
+            "description": "The frequency of the task, i.e. how many times the task can be completed per reset period"
+          },
+          "remainingFrequency": {
+            "type": "integer",
+            "description": "The remaining number of times this task can be completed before the next reset"
+          },
+          "period": {
+            "type": "integer",
+            "description": "The period of the task in period units"
+          },
+          "periodUnit": {
+            "type": "string",
+            "description": "The time unit of the period"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The start time of the task"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "The end time of the task"
+          },
+          "lastResetAt": {
+            "type": "string",
+            "description": "The date that the task timing was last reset."
           }
-        },
-        "required": [
-          "repeat"
-        ]
+        }
       },
       "Questionnaire": {
         "type": "object",
         "properties": {
-          "questionnaireName": {
-            "type": "string",
-            "description": "The name of the questionnaire that will be displayed to the patient."
-          },
           "questionnaireId": {
             "type": "string",
             "description": "The id of the questionnaire that will be used to lookup in questionnaire service."
           },
-          "lastCompletedDate": {
+          "assignerId": {
             "type": "string",
-            "description": "The date that the questionnaire was last completed."
-          },
-          "endOfAvailabilityWindow": {
-            "type": "string",
-            "description": "The date that the questionnaire should be completed by."
+            "description": "The reference ID for who assigned the task"
           },
           "available": {
             "type": "boolean",
             "description": "Whether the questionnaire is still able to be completed."
+          },
+          "repeatable": {
+            "type": "boolean",
+            "description": "Whether the task can be immediately repeated once completed"
+          },
+          "timing": {
+            "$ref": "#/components/schemas/Timing"
+          },
+          "lastCompletedDate": {
+            "type": "string",
+            "description": "The date that the questionnaire was last completed."
           }
         },
         "required": [
           "questionnaireId",
-          "questionnaireName",
-          "lastCompletedDate",
-          "endOfAvailabilityWindow",
+          "assignerId",
           "available"
         ]
       }
@@ -497,10 +494,22 @@
           "data": [
             {
               "questionnaireId": "1",
-              "questionnaireName": "Questionnaire 1",
-              "lastCompletedDate": "2020-01-01T00:00:00Z",
-              "endOfAvailabilityWindow": "2020-01-01T00:00:00Z",
-              "available": true
+              "assignerId": "80704e6a-9541-4468-ad75-1c0bd50ca310",
+              "available": true,
+              "repeatable": true,
+              "lastCompletedDate": "2020-01-01T00:00:00Z"
+            },
+            {
+              "questionnaireId": "2",
+              "assignerId": "80704e6a-9541-4468-ad75-1c0bd50ca310",
+              "available": false,
+              "timing": {
+                "frequency": 1,
+                "remainingFrequency": 0,
+                "period": 1,
+                "periodUnit": "w"
+              },
+              "lastCompletedDate": "2020-01-01T00:00:00Z"
             }
           ]
         }
@@ -514,22 +523,30 @@
           },
           "data": [
             {
-              "tenantId": "h387afy7-B898-253F93F1F48C",
-              "patientId": "h387afy7-B898-253F93F1F48C",
-              "referenceId": "h387afy7-B898-253F93F1F48C",
+              "tenantId": "ronin",
+              "patientId": "f576ca9c-dbd1-4af0-ac53-b868948a3d7a",
+              "assignerId": "80704e6a-9541-4468-ad75-1c0bd50ca310",
               "type": "QUESTIONNAIRE",
-              "assignerId": "h387afy7-B898-253F93F1F48C",
+              "referenceId": "1",
+              "active": true,
+              "repeatable": true,
               "timing": {
-                "repeat": {
-                  "period": 1,
-                  "periodUnit": "d",
-                  "bounds": {
-                    "start": "2020-01-01T00:00:00.000Z",
-                    "end": "2020-01-27T00:00:00.000Z"
-                  }
-                }
-              },
-              "active": true
+                "start": "2020-01-01T00:00:00.000Z",
+                "end": "2020-01-27T00:00:00.000Z"
+              }
+            },
+            {
+              "tenantId": "ronin",
+              "patientId": "f576ca9c-dbd1-4af0-ac53-b868948a3d7a",
+              "assignerId": "80704e6a-9541-4468-ad75-1c0bd50ca310",
+              "type": "QUESTIONNAIRE",
+              "referenceId": "2",
+              "active": true,
+              "timing": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "w"
+              }
             }
           ]
         }
